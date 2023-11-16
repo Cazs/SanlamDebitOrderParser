@@ -67,35 +67,36 @@ foreach (XmlElement doitem in debitOrdersXmlElements)
     debitOrder.Deductions = deductionsSet;
     debitOrdersList.Add(debitOrder);
 
-    var dodGrouped = debitOrder.Deductions.GroupBy(d => d.BankName);
+    var groupedDebitOrderDeductions = debitOrder.Deductions.GroupBy(d => d.BankName);
 
-    foreach (var dod in dodGrouped)
+    foreach (var debitOrderDeduction in groupedDebitOrderDeductions)
     {
-        StringBuilder str = new StringBuilder();
+        StringBuilder bankDebitOrders = new StringBuilder();
 
-        var groupTotal = dod.Sum(d => d.Amount);
-        var maxNameLength = dod.Key.Length <= 16 ? dod.Key.Length : 16;
-        var maxRecordCountLength = dod.Count().ToString().Length <= 3 ? dod.Count().ToString().Length : 3;
+        var groupTotal = debitOrderDeduction.Sum(dod => dod.Amount);
+        var maxNameLength = debitOrderDeduction.Key.Length <= 16 ? debitOrderDeduction.Key.Length : 16;
+        var maxRecordCountLength = debitOrderDeduction.Count().ToString().Length <= 3 ? debitOrderDeduction.Count().ToString().Length : 3;
         var maxGroupTotalLength = groupTotal.ToString().Replace(".", "").Length <= 10 ? groupTotal.ToString().Replace(".", "").Length : 10;
 
-        string bankInfo = dod.Key.ToUpper().Substring(0, maxNameLength) + " " + String.Concat(dod.Count().ToString().Substring(0, maxRecordCountLength).PadLeft(3, '0'), groupTotal.ToString().Replace(".", "").Substring(0, maxGroupTotalLength).PadLeft(10, '0'));
-        str.AppendLine(bankInfo);
+        string bankHeaderInfo = debitOrderDeduction.Key.ToUpper().Substring(0, maxNameLength) + " " + String.Concat(groupedDebitOrderDeductions.Count().ToString().Substring(0, maxRecordCountLength).PadLeft(3, '0'), groupTotal.ToString().Replace(".", "").Substring(0, maxGroupTotalLength).PadLeft(10, '0'));
+        bankDebitOrders.AppendLine(bankHeaderInfo);
 
-        dod.OrderBy(d => d.getSurname())
-            .OrderBy(d => d.Amount)
+        debitOrderDeduction
+            .OrderBy(dod => dod.getSurname())
+            .OrderBy(dod => dod.Amount)
             .ToList()
-            .ForEach(elem => {
-                var debitOrderInfo = String.Concat(elem.getInitial(), elem.getSurname())
-                    + " " + elem.getAccountNumber()
-                    + " " + elem.AccountType
-                    + " " + elem.getBranchName()
-                    + " " + elem.getAmount()
-                    + " " + elem.getDebitOrderDate();
+            .ForEach(dod => {
+                var debitOrderInfo = String.Concat(dod.getInitial(), dod.getSurname())
+                    + " " + dod.getAccountNumber()
+                    + " " + dod.getAccountType()
+                    + " " + dod.getBranchName()
+                    + " " + dod.getAmount()
+                    + dod.getDebitOrderDate();
 
-                str.AppendLine(debitOrderInfo);
+                bankDebitOrders.AppendLine(debitOrderInfo);
             });
 
-        string filePath = string.Format(".\\{0}.txt", dod.Key);
-        File.WriteAllText(file, str.ToString());
+        string bankDebitOrdersFilePath = string.Format(".\\{0}.txt", debitOrderDeduction.Key);
+        File.WriteAllText(bankDebitOrdersFilePath, bankDebitOrders.ToString());
     }
 }

@@ -2,6 +2,12 @@
 using System.Xml;
 using System.Xml.XPath;
 using SanlamSkyDebitOrderParser.Models;
+using Serilog;
+
+using var errorLogger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("error-log.txt")
+    .CreateLogger();
 
 XmlDocument xmlDoc = new XmlDocument();
 xmlDoc.Load("debitorders file.xml");
@@ -12,26 +18,26 @@ List<DebitOrder> debitOrdersList = new List<DebitOrder>();
 DebitOrder debitOrder;
 HashSet<Deduction> deductionsSet;
 
-foreach (XmlElement doitem in debitOrdersXmlElements)
+foreach (XmlElement debitOrderXmlElem in debitOrdersXmlElements)
 {
     debitOrder = new DebitOrder();
     deductionsSet = new HashSet<Deduction>();
 
-    XmlNodeList deductionsXml = doitem.GetElementsByTagName("deduction");
+    XmlNodeList deductionsXml = debitOrderXmlElem.GetElementsByTagName("deduction");
 
-    foreach (XmlNode ditem in deductionsXml)
+    foreach (XmlNode deductionXmlElem in deductionsXml)
     {
-        if (ditem != null)
+        if (deductionXmlElem != null)
         {
             try
             {
-                string accountholder = ditem.SelectSingleNode("accountholder").InnerText;
-                string accountnumber = ditem.SelectSingleNode("accountnumber").InnerText;
-                string accounttype = ditem.SelectSingleNode("accounttype").InnerText;
-                string bankname = ditem.SelectSingleNode("bankname").InnerText;
-                string branch = ditem.SelectSingleNode("branch").InnerText;
-                string amount = ditem.SelectSingleNode("amount").InnerText;
-                string date = ditem.SelectSingleNode("date").InnerText;
+                string accountholder = deductionXmlElem.SelectSingleNode("accountholder").InnerText;
+                string accountnumber = deductionXmlElem.SelectSingleNode("accountnumber").InnerText;
+                string accounttype = deductionXmlElem.SelectSingleNode("accounttype").InnerText;
+                string bankname = deductionXmlElem.SelectSingleNode("bankname").InnerText;
+                string branch = deductionXmlElem.SelectSingleNode("branch").InnerText;
+                string amount = deductionXmlElem.SelectSingleNode("amount").InnerText;
+                string date = deductionXmlElem.SelectSingleNode("date").InnerText;
 
                 if (accountholder != null
                     & accountnumber != null
@@ -48,18 +54,24 @@ foreach (XmlElement doitem in debitOrdersXmlElements)
                                               branch,
                                               Double.Parse(amount),
                                               DateTime.Parse(date)));
+                } else
+                {
+                    errorLogger.Error("[ERROR] Invalid XML Data.");
                 }
             } catch (XPathException ex)
             {
-                Console.WriteLine("[ERROR] Could not get XML Object due to a Path error: " + ex.Message);
+                Console.WriteLine("[ERROR] Could not get XML Object due to a path error: " + ex.Message);
+                errorLogger.Error("[ERROR] Could not get XML Object due to a path error: " + ex.Message);
             }
             catch (NullReferenceException ex)
             {
                 Console.WriteLine("[ERROR] Could not get XML Object due to a null error: " + ex.Message);
+                errorLogger.Error("[ERROR] Could not get XML Object due to a null error: " + ex.Message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("[ERROR] Could not get XML Object due to an error: " + ex.Message);
+                errorLogger.Error("[ERROR] Could not get XML Object due to an error: " + ex.Message);
             }
         }
     }
@@ -97,6 +109,15 @@ foreach (XmlElement doitem in debitOrdersXmlElements)
             });
 
         string bankDebitOrdersFilePath = string.Format(".\\{0}.txt", debitOrderDeduction.Key);
-        File.WriteAllText(bankDebitOrdersFilePath, bankDebitOrders.ToString());
+ 
+        // File.WriteAllText(bankDebitOrdersFilePath, bankDebitOrders.ToString());
+
+        using var bankDebitOrderLogger = new LoggerConfiguration()
+            //.WriteTo.Console()
+            .WriteTo.File(bankDebitOrdersFilePath)
+            .CreateLogger();
+
+        bankDebitOrderLogger.Write(Serilog.Events.LogEventLevel.Information, String.Concat("\r\n", bankDebitOrders.ToString()));
+        await bankDebitOrderLogger.DisposeAsync();
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Text;
+using System.Xml;
 using System.Xml.XPath;
 using SanlamSkyDebitOrderParser.Models;
 
@@ -70,17 +71,31 @@ foreach (XmlElement doitem in debitOrdersXmlElements)
 
     foreach (var dod in dodGrouped)
     {
+        StringBuilder str = new StringBuilder();
+
         var groupTotal = dod.Sum(d => d.Amount);
         var maxNameLength = dod.Key.Length <= 16 ? dod.Key.Length : 16;
         var maxRecordCountLength = dod.Count().ToString().Length <= 3 ? dod.Count().ToString().Length : 3;
         var maxGroupTotalLength = groupTotal.ToString().Replace(".", "").Length <= 10 ? groupTotal.ToString().Replace(".", "").Length : 10;
 
-        Console.WriteLine(dod.Key.ToUpper().Substring(0, maxNameLength) + " " + String.Concat(dod.Count().ToString().Substring(0, maxRecordCountLength).PadLeft(3, '0'), groupTotal.ToString().Replace(".", "").Substring(0, maxGroupTotalLength).PadLeft(10, '0')));
+        string bankInfo = dod.Key.ToUpper().Substring(0, maxNameLength) + " " + String.Concat(dod.Count().ToString().Substring(0, maxRecordCountLength).PadLeft(3, '0'), groupTotal.ToString().Replace(".", "").Substring(0, maxGroupTotalLength).PadLeft(10, '0'));
+        str.AppendLine(bankInfo);
 
         dod.OrderBy(d => d.getSurname())
             .OrderBy(d => d.Amount)
             .ToList()
-            .ForEach(elem =>
-                Console.WriteLine($"{String.Concat(elem.getInitial(), elem.getSurname())} {elem.getAccountNumber()} {elem.AccountType} {elem.getBranchName()} {elem.getAmount()} {elem.getDebitOrderDate()}"));
+            .ForEach(elem => {
+                var debitOrderInfo = String.Concat(elem.getInitial(), elem.getSurname())
+                    + " " + elem.getAccountNumber()
+                    + " " + elem.AccountType
+                    + " " + elem.getBranchName()
+                    + " " + elem.getAmount()
+                    + " " + elem.getDebitOrderDate();
+
+                str.AppendLine(debitOrderInfo);
+            });
+
+        string filePath = string.Format(".\\{0}.txt", dod.Key);
+        File.WriteAllText(file, str.ToString());
     }
 }

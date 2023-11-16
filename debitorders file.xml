@@ -1,0 +1,56 @@
+<debitorders>
+  <deduction>
+    <accountholder>Georgina Sinclair</accountholder>
+	<accountnumber>408999703657</accountnumber>
+	<accounttype>cheque</accounttype>
+	<bankname>First National Bank</bankname>
+	<branch>Fourways</branch>
+	<amount>275.00</amount>
+	<date>12/01/2012</date>
+  </deduction>
+  <deduction>
+    <accountholder>Zachary Whitehead</accountholder>
+	<accountnumber>409122372301</accountnumber>
+	<accounttype>cheque</accounttype>
+	<bankname>ABSA</bankname>
+	<branch>Irene</branch>
+	<amount>70.25</amount>
+	<date>12/01/2012</date>
+  </deduction>
+  <deduction>
+    <accountholder>Toby Henderson</accountholder>
+	<accountnumber>401255489873</accountnumber>
+	<accounttype>cheque</accounttype>
+	<bankname>First National Bank</bankname>
+	<branch>Edenvale</branch>
+	<amount>181.03</amount>
+	<date>12/13/2012</date>
+  </deduction>
+  <deduction>
+    <accountholder>Katherine Cooke</accountholder>
+	<accountnumber>409155874935</accountnumber>
+	<accounttype>savings</accounttype>
+	<bankname>ABSA</bankname>
+	<branch>Southdowns</branch>
+	<amount>975.89</amount>
+	<date>01/01/2013</date>
+  </deduction>
+  <deduction>
+    <accountholder>Bradley James</accountholder>
+	<accountnumber>409254998</accountnumber>
+	<accounttype>savings</accounttype>
+	<bankname>ABSA</bankname>
+	<branch>Melville</branch>
+	<amount>207.74</amount>
+	<date>12/09/2012</date>
+  </deduction>
+  <deduction>
+    <accountholder>Sophie Lane</accountholder>
+	<accountnumber>409771987</accountnumber>
+	<accounttype>savings</accounttype>
+	<bankname>ABSA</bankname>
+	<branch>Roodepoort</branch>
+	<amount>207.74</amount>
+	<date>12/31/2012</date>
+  </deduction>
+</debitorders>

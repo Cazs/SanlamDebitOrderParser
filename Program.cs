@@ -60,18 +60,19 @@ foreach (XmlElement debitOrderXmlElem in debitOrdersXmlElements)
                 }
             } catch (XPathException ex)
             {
-                Console.WriteLine("[ERROR] Could not get XML Object due to a path error: " + ex.Message);
                 errorLogger.Error("[ERROR] Could not get XML Object due to a path error: " + ex.Message);
             }
             catch (NullReferenceException ex)
             {
-                Console.WriteLine("[ERROR] Could not get XML Object due to a null error: " + ex.Message);
                 errorLogger.Error("[ERROR] Could not get XML Object due to a null error: " + ex.Message);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR] Could not get XML Object due to an error: " + ex.Message);
                 errorLogger.Error("[ERROR] Could not get XML Object due to an error: " + ex.Message);
+            }
+            finally
+            {
+                await errorLogger.DisposeAsync();
             }
         }
     }

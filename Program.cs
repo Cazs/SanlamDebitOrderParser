@@ -76,5 +76,11 @@ foreach (XmlElement doitem in debitOrdersXmlElements)
         var maxGroupTotalLength = groupTotal.ToString().Replace(".", "").Length <= 10 ? groupTotal.ToString().Replace(".", "").Length : 10;
 
         Console.WriteLine(dod.Key.ToUpper().Substring(0, maxNameLength) + " " + String.Concat(dod.Count().ToString().Substring(0, maxRecordCountLength).PadLeft(3, '0'), groupTotal.ToString().Replace(".", "").Substring(0, maxGroupTotalLength).PadLeft(10, '0')));
+
+        dod.OrderBy(d => d.getSurname())
+            .OrderBy(d => d.Amount)
+            .ToList()
+            .ForEach(elem =>
+                Console.WriteLine($"{String.Concat(elem.getInitial(), elem.getSurname())} {elem.getAccountNumber()} {elem.AccountType} {elem.getBranchName()} {elem.getAmount()} {elem.getDebitOrderDate()}"));
     }
 }
